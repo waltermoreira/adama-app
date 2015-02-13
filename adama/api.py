@@ -6,7 +6,6 @@ import traceback
 
 from flask import url_for
 from flask.ext.restful import Api
-from flask_restful_swagger import swagger
 
 from . import __version__, app
 from .config import Config
@@ -65,8 +64,8 @@ def api_url_for(endpoint: str, **kwargs: Any) -> str:
     status_endpoint = url_for('status')
     prefix = status_endpoint[:-len('/status')]
     api_endpoint = url_for(endpoint, **kwargs)
-    return (cast(str, Config['api']['url']) +
-            cast(str, Config['api']['prefix']) +
+    return (cast(str, Config.api_url) +
+            cast(str, Config.api_prefix) +
             api_endpoint[len(prefix):])
 
 

@@ -4,7 +4,7 @@
 
 __author__ = 'Walter Moreira'
 __email__ = 'wmoreira@tacc.utexas.edu'
-__version__ = open('/adama-package/adama/VERSION').read().strip()
+__version__ = open('/adama/VERSION').read().strip()
 
 from flask import Flask
 

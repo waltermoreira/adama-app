@@ -35,8 +35,6 @@ from .docker import docker_output, start_container, tail_logs, safe_docker
 from .tools import identifier, service_iden, adapter_iden, interleave
 from .tasks import Producer
 from .service_store import service_store
-from .swagger import swagger
-from .namespace import DeleteResponseModel
 from .tools import chdir
 from .entity import get_permissions
 
@@ -423,17 +421,6 @@ class Service(AbstractService):
 
 class ServiceQueryResource(restful.Resource):
 
-    @swagger.operation(
-        notes=textwrap.dedent(
-            """Perform a search query using the adapter registered for this
-            service.
-
-            <p>The parameters and response type of this operation are
-            dependent on the particular service.</p>
-
-            """),
-        nickname='search'
-    )
     def get(self, namespace, service):
         """Perform a query using a service"""
 
@@ -456,17 +443,6 @@ class ServiceQueryResource(restful.Resource):
 
 class ServiceListResource(restful.Resource):
 
-    @swagger.operation(
-        notes=textwrap.dedent(
-            """Perform a list query using the adapter registered for this
-            service.
-
-            <p>This query takes no parameters other than pagination
-            specific parameters. It returns a list of objects.</p>
-
-            """),
-        nickname='list'
-    )
     def get(self, namespace, service):
         """List all objects using a service"""
         
@@ -485,84 +461,8 @@ class ServiceListResource(restful.Resource):
         return dict(request.args)
 
 
-@swagger.model
-class ServiceModel(object):
-
-    resource_fields = {
-        'name': restful.fields.String(attribute='name of the service'),
-        'namespace': restful.fields.String(
-            attribute='namespace of the service'),
-        'type': restful.fields.String(attribute='type of the adapter'),
-        'code_dir': restful.fields.String(
-            attribute='(internal) location of adapter code in the server'),
-        'version': restful.fields.String(attribute='version of the adapter'),
-        'url': restful.fields.String(
-            attribute='url of third party data service'),
-        'self': restful.fields.String(
-            attribute='url to access this service'),
-        'whitelist': restful.fields.List(
-            restful.fields.String,
-            attribute="ip's or domains the adapter can access"),
-        'description': restful.fields.String(
-            attribute='description of the service'),
-        'requirements': restful.fields.List(
-            restful.fields.String,
-            attribute='third party packages needed by the adapter'),
-        'notify': restful.fields.String(
-            attribute='url to notify via POST when adapter is ready'),
-        'json_path': restful.fields.String(
-            attribute='location of array of results in response'),
-        'main_module': restful.fields.String(
-            attribute='path to main module'),
-        'metadata': restful.fields.String(
-            attribute='path to metadata file')
-    }
-
-
-@swagger.model
-@swagger.nested(
-    result=ServiceModel.__name__
-)
-class ServiceResponseModel(object):
-
-    resource_fields = {
-        'status': restful.fields.String(attribute='success or error'),
-        'result': restful.fields.Nested(ServiceModel.resource_fields)
-    }
-
-
-@swagger.model
-class ModifyServiceResponseModel(object):
-
-    resource_fields = {
-        'status': restful.fields.String(attribute='success or error')
-    }
-
 class ServiceResource(restful.Resource):
 
-    @swagger.operation(
-        notes="Obtain information about a service.",
-        nickname="getService",
-        responseClass=ServiceResponseModel.__name__,
-        parameters=[
-            {
-                'name': 'namespace',
-                'description': 'namespace of the service',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            },
-            {
-                'name': 'service',
-                'description': 'name of the service, including the version',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            }
-        ]
-    )
     def get(self, namespace, service):
         """Get information about a service"""
 
@@ -585,32 +485,6 @@ class ServiceResource(restful.Resource):
                 .format(namespace, service),
                 404)
 
-    @swagger.operation(
-        notes="Delete a service in a namespace. Note that this operation "
-              "always succeed. Also, the service is deleted only in the "
-              "given namespace, and since the name includes the version, "
-              "no other version of the same service is deleted.",
-        nickname='deleteService',
-        responseClass=DeleteResponseModel.__name__,
-        parameters=[
-            {
-                'name': 'namespace',
-                'description': 'namespace of the service',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            },
-            {
-                'name': 'service',
-                'description': 'name of the service, including the version',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            }
-        ]
-    )
     def delete(self, namespace, service):
         """Delete a service"""
 
@@ -633,129 +507,6 @@ class ServiceResource(restful.Resource):
             pass
         return ok({})
 
-    @swagger.operation(
-        notes=textwrap.dedent(
-            """Modify an existing service.
-
-            <p>This method allows to modify an existing service. Code can
-            be updated by specifiying the 'code' parameter, or by setting
-            the field 'update_git_repository', in which case the adapter
-            performs a "git pull". </p>
-
-            """),
-        nickname='modifyService',
-        responseClass=ModifyServiceResponseModel.__name__,
-        consumes='multipart/form-data',
-        parameters=[
-            {
-                'name': 'namespace',
-                'description': 'namespace of the service',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            },
-            {
-                'name': 'service',
-                'description': 'name of the service, including the version',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            },
-            {
-                'name': 'metadata',
-                'description': 'path of metadata file relative to '
-                               'git_repository root',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'type',
-                'description': 'type of the adapter',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'url',
-                'description': 'url of the third party data service',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'whitelist',
-                'description': 'ip or domain to be whitelisted',
-                'required': False,
-                'allowMultiple': True,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'description',
-                'description': 'description of the service',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'requirements',
-                'description': 'third party package needed by the adapter',
-                'required': False,
-                'allowMultiple': True,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'notify',
-                'description': 'url to notify when adapter is ready',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'json_path',
-                'description': 'location of the array of result in response',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'main_module',
-                'description': 'path of main module relative to '
-                               'git_repository root',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'code',
-                'description': 'type of the adapter',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'File',
-                'paramType': 'form'
-            },
-            {
-                'name': 'update_git_repository',
-                'description': ('whether to update the git repository via'
-                                '"git pull"'),
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            }
-        ]
-    )
     def put(self, namespace, service):
         """Modify a service"""
 

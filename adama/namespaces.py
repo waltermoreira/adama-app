@@ -3,90 +3,20 @@ from flask.ext import restful
 
 from typing import Dict, List, Any
 
-from .swagger import swagger
 from .api import APIException, ok, api_url_for
 from .requestparser import RequestParser
-from .namespace import Namespace, NamespaceModel, NamespaceResponseModel
+from .namespace import Namespace
 from .namespace_store import namespace_store
 
 
-@swagger.model
-@swagger.nested(
-    result=NamespaceModel.__name__
-)
-class NamespacesResponseModel(object):
-     """List of namespaces"""
-
-     resource_fields = {
-         'status': restful.fields.String(attribute='success or error'),
-         'result': restful.fields.List(
-             restful.fields.Nested(NamespaceModel.resource_fields))
-     }
-
-
-@swagger.model
-class CreatedNamespaceModel(object):
-
-    resource_fields = {
-        'status': restful.fields.String(attribute='success or error'),
-        'result': restful.fields.String(
-            attribute='Url of the new created namespace')
-    }
-
 class NamespacesResource(restful.Resource):
 
-    @swagger.operation(
-        notes='Create a new namespace.',
-        nickname='createNamespace',
-        responseClass=CreatedNamespaceModel.__name__,
-        parameters=[
-            {
-                'name': 'name',
-                'description': 'name of the namespace',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'url',
-                'description': 'url associated to this namespace',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            },
-            {
-                'name': 'description',
-                'description': 'description of this namespace',
-                'required': False,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'form'
-            }
-        ]
-    )
     def post(self):
         """Create a new namespace"""
 
         args = validate_post()
         return ok({'result': register_namespace(args)})
 
-    @swagger.operation(
-        notes="Return a list of all registered namespaces.",
-        responseClass=NamespacesResponseModel.__name__,
-        nickname='getNamespaces',
-        responseMessages=[
-            {
-                'code': 200,
-                'message': 'list of namespaces'
-            },
-            {
-                'code': 500,
-                'message': 'internal error'
-            },
-        ]
-    )
     def get(self):
         """Get list of namespaces"""
 

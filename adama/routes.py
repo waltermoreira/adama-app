@@ -26,7 +26,7 @@ from .status import StatusResource
 from .token_store import token_store
 from .tools import location_of
 
-PREFIX = Config['server']['prefix']
+PREFIX = Config.server_prefix
 HERE = location_of(__file__)
 
 print('Using PREFIX = {}'.format(PREFIX))
@@ -86,7 +86,7 @@ def check_access():
     # don't control access to OPTIONS verb
     if request.method == 'OPTIONS':
         return
-    access_control_type = Config['server']['access_control']
+    access_control_type = Config.server_access_control
     if access_control_type == 'none':
         g.user = 'anonymous'
         return
@@ -98,14 +98,14 @@ def check_access():
 
 
 def get_pub_key():
-    pub_key = Config['server']['apim_public_key']
+    pub_key = Config.server_apim_public_key
     return RSA.importKey(base64.b64decode(pub_key))
 
 
 PUB_KEY = get_pub_key()
 
 def check_jwt(request):
-    tenant_name = Config['api']['tenant_name']
+    tenant_name = Config.api_tenant_name
     try:
         decoded = jwt.decode(
             request.headers['X-JWT-Assertion-{0}'.format(tenant_name)],

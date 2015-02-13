@@ -5,43 +5,7 @@ from typing import Dict, Any, List
 
 from .api import APIException, ok, api_url_for
 from .namespace_store import namespace_store
-from .swagger import swagger
 from .entity import get_permissions
-
-
-@swagger.model
-class NamespaceModel(object):
-
-    resource_fields = {
-        'name': restful.fields.String(attribute='Name of the namespace'),
-        'url': restful.fields.String(
-            attribute='Url associated to the namespace '
-                      '(for documentation purposes)'),
-        'self': restful.fields.String(
-            attribute='Url to access this namespace'),
-        'description': restful.fields.String(
-            attribute='Description of the namespace'),
-    }
-
-
-@swagger.model
-@swagger.nested(
-    result=NamespaceModel.__name__
-)
-class NamespaceResponseModel(object):
-
-    resource_fields = {
-        'status': restful.fields.String(attribute='success or error'),
-        'result': restful.fields.Nested(NamespaceModel.resource_fields)
-    }
-
-
-@swagger.model
-class DeleteResponseModel(object):
-
-    resource_fields = {
-        'status': restful.fields.String(attribute='success')
-    }
 
 
 class Namespace(object):
@@ -79,21 +43,6 @@ class Namespace(object):
 
 class NamespaceResource(restful.Resource):
 
-    @swagger.operation(
-        notes='Return information about a namespace.',
-        nickname='getNamespace',
-        responseClass=NamespaceResponseModel.__name__,
-        parameters=[
-            {
-                'name': 'namespace',
-                'description': 'name of namespace',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            }
-        ]
-    )
     def get(self, namespace):
         """Get information about a namespace"""
 
@@ -104,22 +53,6 @@ class NamespaceResource(restful.Resource):
             raise APIException(
                 "namespace not found: {}'".format(namespace), 404)
 
-    @swagger.operation(
-        notes='Delete a namespace. Note that this operation always succeed '
-              'regardless of the existence of the namespace.',
-        nickname='deleteNamespace',
-        responseClass=DeleteResponseModel.__name__,
-        parameters=[
-            {
-                'name': 'namespace',
-                'description': 'name of namespace',
-                'required': True,
-                'allowMultiple': False,
-                'dataType': 'string',
-                'paramType': 'path'
-            }
-        ]
-    )
     def delete(self, namespace):
         """Delete a namespace"""
 
