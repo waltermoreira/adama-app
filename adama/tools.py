@@ -75,7 +75,7 @@ def chdir(directory):
 
 def node(role: str) -> Dict[str, Any]:
     try:
-        with open('/serfnode/nodes.json') as nodes_file:
+        with open('/serfnode/serfnodes_by_role.json') as nodes_file:
             all_nodes = json.load(nodes_file)
             nodes = all_nodes[role]
             nodes.sort(key=lambda obj: float(obj['timestamp']))
@@ -95,4 +95,4 @@ def location(role: str, port: int) -> Tuple[str, int]:
     except KeyError:
         raise AdamaError('port {}/tcp not found for role {}'
                          .format(port, role))
-    return info['ip'], port
+    return info['service_ip'], port
