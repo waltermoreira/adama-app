@@ -3,13 +3,11 @@ import pickle
 
 import redis
 
-from .tools import location
-
 
 class Store(collections.MutableMapping):
 
     def __init__(self, db=0):
-        host, port = location('redis', 6379)
+        host, port = 'redis', 6379
         self._db = redis.StrictRedis(host=host, port=port, db=db)
 
     def __getitem__(self, key):
