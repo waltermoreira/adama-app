@@ -16,8 +16,15 @@ class StatusResource(restful.Resource):
 
 
 def my_info() -> Tuple[str, str]:
-    me = json.load(open('/me.json'))
-    return me['Image'], me['Id']
+    try:
+        me = json.load(open('/me.json'))
+        return me['inspect']['Image'], me['inspect']['Id']
+    except FileNotFoundError:
+        msg = ("couldn't find container info "
+               "(maybe not running in a serfnode?)")
+    except (KeyError, ValueError):
+        msg = 'wrong format for container info'
+    return msg, msg
 
 
 def status() -> Dict[str, str]:
