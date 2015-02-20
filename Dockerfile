@@ -1,4 +1,4 @@
-FROM serfnode
+FROM ubuntu:14.04
 
 MAINTAINER Walter Moreira <wmoreira@tacc.utexas.edu>
 
@@ -12,6 +12,5 @@ RUN pip3 install -r requirements.txt
 COPY stubs/ /stubs
 ENV MYPYPATH /stubs
 COPY adama/ /adama
-COPY handler /handler
 
-WORKDIR /adama
+WORKDIR /
