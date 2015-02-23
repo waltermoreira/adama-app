@@ -691,7 +691,7 @@ def render_template(main_module_path: str,
     """
 
     dockerfile_template = jinja2.Template(
-        open('/adama-package/adama/containers/Dockerfile.adapter').read())
+        open('/adama/containers/Dockerfile.adapter').read())
     requirement_cmds = (
         'RUN ' + requirements_installer(language, requirements)
         if requirements else '')
