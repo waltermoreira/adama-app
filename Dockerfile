@@ -12,5 +12,6 @@ RUN pip3 install -r requirements.txt
 COPY stubs/ /stubs
 ENV MYPYPATH /stubs
 COPY adama/ /adama
+COPY devel.py /devel.py
 
 WORKDIR /
