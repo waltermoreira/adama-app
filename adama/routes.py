@@ -19,8 +19,8 @@ from .config import Config
 from .namespaces import NamespacesResource
 from .namespace import NamespaceResource
 from .services import ServicesResource
-# from .service import (ServiceResource, ServiceQueryResource,
-#                       ServiceListResource, ServiceHealthResource)
+from .service import (ServiceResource, ServiceQueryResource,
+                      ServiceListResource, ServiceHealthResource)
 # from .passthrough import PassthroughServiceResource
 from .status import StatusResource
 from .token_store import token_store
@@ -44,14 +44,14 @@ api.add_resource(NamespaceResource, url('/<string:namespace>'),
                  endpoint='namespace')
 api.add_resource(ServicesResource, url('/<string:namespace>/services'),
                  endpoint='services')
-# api.add_resource(ServiceResource, url('/<string:namespace>/<string:service>'),
-#                  endpoint='service')
-# api.add_resource(ServiceQueryResource,
-#                  url('/<string:namespace>/<string:service>/search'),
-#                  endpoint='search')
-# api.add_resource(ServiceListResource,
-#                  url('/<string:namespace>/<string:service>/list'),
-#                  endpoint='list')
+api.add_resource(ServiceResource, url('/<string:namespace>/<string:service>'),
+                 endpoint='service')
+api.add_resource(ServiceQueryResource,
+                 url('/<string:namespace>/<string:service>/search'),
+                 endpoint='search')
+api.add_resource(ServiceListResource,
+                 url('/<string:namespace>/<string:service>/list'),
+                 endpoint='list')
 # api.add_resource(PassthroughServiceResource,
 #                  url('/<string:namespace>/<string:service>/access'),
 #                  url('/<string:namespace>/<string:service>/access/'
