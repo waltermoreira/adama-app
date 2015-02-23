@@ -79,7 +79,7 @@ class ServicesResource(restful.Resource):
 
         args = parser.parse_args()
 
-        for key, value in args.items():
+        for key, value in list(args.items()):
             if value is None:
                 del args[key]
 
