@@ -14,7 +14,7 @@ backports.ssl-match-hostname==3.4.0.2
 billiard==3.3.0.17
 binaryornot==0.3.0
 blessings==1.6
-celery==3.1.11
+celery==5.2.2
 chardet==2.3.0
 click==3.3
 colorama==0.2.5
